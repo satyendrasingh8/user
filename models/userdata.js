@@ -1,8 +1,13 @@
 const mongoose = require("mongoose");
-const { stringify } = require("querystring");
+const validator = require("validator")
 
 const userSchema = mongoose.Schema({
-    name:{
+    firstname:{
+        type:String,
+        required:true,
+        trim:true,
+    },
+    lastname:{
         type:String,
         required:true,
         trim:true,
@@ -10,9 +15,18 @@ const userSchema = mongoose.Schema({
     email:{
         type:String,
         required:true,
-        unique:true
+        unique:[true,"Email already exist"],
+        validate(value){
+        if(!validator.isEmail(value)){
+            throw new Error("Email is Invalid")
+        }
+        }
     },
     phone:{
+        type:Number,
+        required:true
+    },
+    age:{
         type:Number,
         required:true
     },
@@ -23,5 +37,15 @@ const userSchema = mongoose.Schema({
     confirmPassword:{
         type:String,
         required:true
-    }
-})
+    },
+    tokens:[{
+        token:{
+            type:String,
+            required:true
+        }
+    }]
+});
+
+const User = mongoose.model("User",userSchema);
+
+module.exports = User;
